@@ -1,0 +1,1 @@
+const products = [{"name": "NVIDIA RTX 4090", "oldPrice": 536, "newPrice": 404, "link": "https://example.com", "updated": "2026-01-07"}, {"name": "AMD RX 7800 XT", "oldPrice": 944, "newPrice": 753, "link": "https://example.com", "updated": "2026-01-07"}];
