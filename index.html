@@ -2,52 +2,77 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>GPU Price Drops This Week</title>
-  <meta name="description" content="Track notable GPU price drops. Updated weekly with real market data.">
+  <title>GPU Price Hub – Weekly GPU Deals & Amazon Price Checks</title>
+  <meta name="description" content="GPU Price Hub highlights GPUs worth checking on Amazon. Weekly updates on NVIDIA and AMD graphics cards.">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
+
 <header class="top">
   <div class="container">
-    <h1>GPU Price Watch</h1>
-    <p class="subtitle">Tracking real GPU price drops — updated weekly</p>
+    <h1>GPU Price Hub</h1>
+    <p class="subtitle">
+      Discover which GPUs are worth checking on Amazon — updated weekly.
+    </p>
   </div>
 </header>
 
 <main class="container">
-  <section class="section">
+
+  <!-- THIS WEEK -->
+  <section class="section" id="weekly-deals">
     <div class="section-header">
-      <h2>Notable Drops This Week</h2>
-      <span class="updated">Updated Jan 2026</span>
+      <h2>This Week’s GPU Deals</h2>
+      <span class="updated" id="updated-label">Updated —</span>
     </div>
 
-    <div id="product-list" class="grid"></div>
+    <div class="grid" id="deals-grid">
+      <p class="meta">Loading deals…</p>
+    </div>
   </section>
- <section class="section section-archive">
-  <div class="section-header">
-    <h2>Past Weeks</h2>
-  </div>
 
-  <!-- WEEK_ARCHIVE_START -->
-<ul class="week-archive">
-  <li>
-    <a href="week-2026-02.html">
-      <span class="week-title">Week 02, 2026</span>
-      <span class="week-label">GPU Price Drops</span>
-    </a>
-  </li>
-</ul>
-<!-- WEEK_ARCHIVE_END -->
-</section>
+  <!-- BROWSE GPUS -->
+  <section class="section">
+    <div class="section-header">
+      <h2>Browse GPUs</h2>
+    </div>
+
+    <div class="grid">
+      <div class="product-card">
+        <h3>NVIDIA GPUs</h3>
+        <ul class="meta">
+          <li><a href="site/rtx-5080.html">RTX 5080</a></li>
+        </ul>
+      </div>
+
+      <div class="product-card">
+        <h3>AMD GPUs</h3>
+      </div>
+    </div>
+  </section>
+
+  <!-- WEEKLY ARCHIVE -->
+  <section class="section section-archive">
+    <div class="section-header">
+      <h2>Weekly Updates</h2>
+    </div>
+
+    <ul class="week-archive">
+      <li>
+        <a href="site/week-2026-03.html">
+          <span class="week-title">Week 03, 2026</span>
+          <span class="week-label">GPU Price Watch</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
 </main>
 
 <footer class="footer">
-  <p>
-    As an Amazon Associate I earn from qualifying purchases.
-  </p>
-
+  <p>As an Amazon Associate I earn from qualifying purchases.</p>
   <nav class="footer-links">
     <a href="about.html">About</a>
     <a href="privacy.html">Privacy Policy</a>
@@ -55,8 +80,66 @@
   </nav>
 </footer>
 
+<!-- ================= DATA + RENDER ================= -->
+<script src="js/data.js?v=20260115_1439"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const grid = document.getElementById("deals-grid");
+    const updatedLabel = document.getElementById("updated-label");
 
-<script src="js/data.js"></script>
-<script src="js/render.js"></script>
+    // HARD GUARD
+    if (typeof DATA === "undefined") {
+      updatedLabel.textContent = "Updated recently";
+      grid.innerHTML =
+        "<p class='meta'>Data not loaded.</p>";
+      return;
+    }
+
+    // Update timestamp
+    updatedLabel.textContent =
+      "Updated " + new Date(DATA.generatedAt).toLocaleDateString();
+
+    // No deals
+    if (DATA.count === 0) {
+      grid.innerHTML =
+        "<p class='meta'>No notable GPU price drops this week.</p>";
+      return;
+    }
+
+    // Render deals
+    grid.innerHTML = "";
+
+    DATA.products.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "product-card";
+
+      card.innerHTML = `
+        <div class="product-image">
+          <img src="${p.image}" alt="${p.name}" loading="lazy">
+        </div>
+
+        <h3>${p.name}</h3>
+
+        <div class="price-row">
+          <span class="old">$${p.oldPrice}</span>
+          <span class="new">$${p.newPrice}</span>
+          <span class="drop">-${p.dropPct}%</span>
+        </div>
+
+        <p class="meta">
+          Price drop detected · Last checked ${p.updated}
+        </p>
+
+        <a class="button" href="${p.link}" target="_blank" rel="noopener">
+          Check current price
+        </a>
+      `;
+
+      grid.appendChild(card);
+    });
+  });
+</script>
+
+
 </body>
 </html>
