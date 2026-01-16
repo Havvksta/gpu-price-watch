@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>GPU Price Hub – Weekly GPU Deals & Amazon Price Checks</title>
-  <meta name="description" content="GPU Price Hub highlights GPUs worth checking on Amazon. Weekly updates on NVIDIA and AMD graphics cards.">
+
+  <meta name="description"
+        content="GPU Price Hub highlights GPUs worth checking on Amazon. Weekly updates on NVIDIA and AMD graphics cards.">
+
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <link rel="stylesheet" href="css/styles.css">
 </head>
 
@@ -39,18 +43,28 @@
       <h2>Browse GPUs</h2>
     </div>
 
-    <div class="grid">
-      <div class="product-card">
-        <h3>NVIDIA GPUs</h3>
-        <ul class="meta">
-          <li><a href="site/rtx-5080.html">RTX 5080</a></li>
-        </ul>
-      </div>
+  <div class="grid">
 
-      <div class="product-card">
-        <h3>AMD GPUs</h3>
-      </div>
+    <div class="product-card">
+      <h3>NVIDIA GPUs</h3>
+      <ul class="meta">
+        <li><a href="site/rtx-5080.html">RTX 5080</a></li>
+        <li><a href="site/rtx-5070.html">RTX 5070</a></li>
+        <li><a href="site/rtx-5070-ti.html">RTX 5070 Ti</a></li>
+        <li><a href="site/rtx-5060.html">RTX 5060</a></li>
+        <li><a href="site/rtx-5060-ti.html">RTX 5060 Ti</a></li>
+      </ul>
     </div>
+
+    <div class="product-card">
+      <h3>AMD GPUs</h3>
+      <ul class="meta">
+        <li><a href="site/rx-9070-xt.html">RX 9070 XT</a></li>
+        <li><a href="site/rx-9060-xt.html">RX 9060 XT</a></li>
+      </ul>
+    </div>
+
+  </div>
   </section>
 
   <!-- WEEKLY ARCHIVE -->
@@ -80,66 +94,107 @@
   </nav>
 </footer>
 
-<!-- ================= DATA + RENDER ================= -->
+<!-- ================= DATA ================= -->
 <script src="js/data.js?v=20260115_1439"></script>
+
+<!-- ================= RENDER ================= -->
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const grid = document.getElementById("deals-grid");
-    const updatedLabel = document.getElementById("updated-label");
+document.addEventListener("DOMContentLoaded", () => {
 
-    // HARD GUARD
-    if (typeof DATA === "undefined") {
-      updatedLabel.textContent = "Updated recently";
-      grid.innerHTML =
-        "<p class='meta'>Data not loaded.</p>";
-      return;
+  /* =====================================================
+     AMAZON AFFILIATE CONFIG
+     ===================================================== */
+
+  const AMAZON_AFFILIATE_TAG = "gpupricehub20-20";
+
+  function withAffiliateTag(url) {
+    try {
+      const u = new URL(url);
+      if (!u.searchParams.has("tag")) {
+        u.searchParams.set("tag", AMAZON_AFFILIATE_TAG);
+      }
+      return u.toString();
+    } catch (e) {
+      return url; // fallback safety
     }
+  }
 
-    // Update timestamp
-    updatedLabel.textContent =
-      "Updated " + new Date(DATA.generatedAt).toLocaleDateString();
+  /* =====================================================
+     DOM REFERENCES
+     ===================================================== */
 
-    // No deals
-    if (DATA.count === 0) {
-      grid.innerHTML =
-        "<p class='meta'>No notable GPU price drops this week.</p>";
-      return;
-    }
+  const grid = document.getElementById("deals-grid");
+  const updatedLabel = document.getElementById("updated-label");
 
-    // Render deals
-    grid.innerHTML = "";
+  /* =====================================================
+     DATA GUARD
+     ===================================================== */
 
-    DATA.products.forEach(p => {
-      const card = document.createElement("div");
-      card.className = "product-card";
+  if (typeof DATA === "undefined") {
+    updatedLabel.textContent = "Updated recently";
+    grid.innerHTML = "<p class='meta'>Data not loaded.</p>";
+    return;
+  }
 
-      card.innerHTML = `
-        <div class="product-image">
-          <img src="${p.image}" alt="${p.name}" loading="lazy">
-        </div>
+  /* =====================================================
+     TIMESTAMP
+     ===================================================== */
 
-        <h3>${p.name}</h3>
+  updatedLabel.textContent =
+    "Updated " + new Date(DATA.generatedAt).toLocaleDateString();
 
-        <div class="price-row">
-          <span class="old">$${p.oldPrice}</span>
-          <span class="new">$${p.newPrice}</span>
-          <span class="drop">-${p.dropPct}%</span>
-        </div>
+  /* =====================================================
+     NO DEALS
+     ===================================================== */
 
-        <p class="meta">
-          Price drop detected · Last checked ${p.updated}
-        </p>
+  if (DATA.count === 0) {
+    grid.innerHTML =
+      "<p class='meta'>No notable GPU price drops this week.</p>";
+    return;
+  }
 
-        <a class="button" href="${p.link}" target="_blank" rel="noopener">
-          Check current price
-        </a>
-      `;
+  /* =====================================================
+     RENDER DEAL CARDS
+     ===================================================== */
 
-      grid.appendChild(card);
-    });
+  grid.innerHTML = "";
+
+  DATA.products.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "product-card";
+
+    const affiliateLink = withAffiliateTag(p.link);
+
+    card.innerHTML = `
+      <div class="product-image">
+        <img src="${p.image}" alt="${p.name}" loading="lazy">
+      </div>
+
+      <h3>${p.name}</h3>
+
+      <div class="price-row">
+        <span class="old">$${p.oldPrice}</span>
+        <span class="new">$${p.newPrice}</span>
+        <span class="drop">-${p.dropPct}%</span>
+      </div>
+
+      <p class="meta">
+        Price drop detected · Last checked ${p.updated}
+      </p>
+
+      <a class="button"
+         href="${affiliateLink}"
+         target="_blank"
+         rel="nofollow sponsored noopener">
+        Check current price
+      </a>
+    `;
+
+    grid.appendChild(card);
   });
-</script>
 
+});
+</script>
 
 </body>
 </html>
